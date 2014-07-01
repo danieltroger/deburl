@@ -1,16 +1,57 @@
 <?php
-error_reporting(E_ALL);
-var_dump(find(getpkglist("http://repo.natur-kultur.eu"),"Package","eu.danieltroger.stether")); // http://apt.saurik.com/dists/ios/main/binary-darwin-arm/
+$repo = $_REQUEST['repo'];
+$bs = $_REQUEST['bs'];
+if(!isset($bs))
+{
+$bs = "";
+}
+if($repo == "saurik")
+{
+$repo = "http://apt.saurik.com/";
+$bs = "dists/ios/main/binary-iphoneos-arm/";
+}
+elseif($repo == "modmyi")
+{
+$repo = "http://apt.modmyi.com";
+$bs = "dists/stable/main/binary-iphoneos-arm/";
+}
+elseif($repo == "bigboss")
+{
+$repo = "http://apt.thebigboss.org/repofiles/cydia";
+$bs = "dists/stable/main/binary-iphoneos-arm/";
+}
+echo pkgurl($repo,$_REQUEST['package'],$bs);
+function pkgurl($repo,$pkg,$bs)
+{
+$repo = validate($repo);
+$pkglist = getpkglist($repo . $bs);
+$sectionstart = find($pkglist,"Package",$pkg);
+if(!$sectionstart)
+{
+die("Package not found");
+}
+return $repo . find($pkglist,"Filename",NULL,$sectionstart,3);
+}
 function getpkglist($repourl)
 {
-$repourl = validate($repourl);
+aaa("getpklist() repourl = {$repourl}");
 $pkglt = getpkglisttype($repourl);
 $pkgurl = $repourl . $pkglt;
+$cachename = "cache/" . str_replace("/","-",$pkgurl);
 if(!$pkglt)
 {
 die("Couldn't find packages listing");
 }
+if(!file_exists($cachename))
+{
 $rawlist = curl($pkgurl);
+file_put_contents($cachename,$rawlist);
+}
+else
+{
+aaa("getting {$cachename} form cache");
+$rawlist = file_get_contents($cachename);
+}
 if($pkglt == "Packages")
 {
 return fix($rawlist);
@@ -49,6 +90,7 @@ return $repourl;
 }
 function getpkglisttype($c)
 {
+aaa("getpkglisttype() {$c}");
 $a = array("Packages.gz","Packages.bz2","Packages");
 foreach($a as $b)
 {
@@ -73,6 +115,7 @@ return true;
 }
 function curl($url)
 {
+aaa("Going to curl {$url}");
 $ch = curl_init( $url );
 curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
 curl_setopt( $ch, CURLOPT_HEADER, true );
@@ -81,9 +124,10 @@ curl_setopt( $ch, CURLOPT_USERAGENT, "PHP55");
 $response = preg_split( '/([\r\n][\r\n])\\1/', curl_exec( $ch ));
 $response = preg_split( '/([\r\n][\r\n]){2}/', curl_exec( $ch ),2);
 curl_close( $ch );
+aaa("Curling done");
 return $response[1];
 }
-function find($haystack,$key,$value,$start = 0)
+function find($haystack,$key,$value,$start = 0,$mode = 2)
 {
 $lines = explode("\n",$haystack);
 for($index = $start;$index < (sizeof($lines) -1);$index++)
@@ -93,14 +137,16 @@ $splitted = explode(":",$line);
 $splitted[1] = substr($splitted[1],1);
 if($splitted[0] == $key)
 {
+if($mode == 2)
+{
 if($splitted[1] == $value)
 {
-echo "{$splitted[1]} matched {$value}\n";
-return $index;
+return $index+1;
 }
-else
+}
+elseif($mode == 3)
 {
-echo "{$splitted[1]} didn't match {$value}\n";
+return $splitted[1];
 }
 }
 }
@@ -109,4 +155,10 @@ return false;
 function fix($a)
 {
 return str_replace("\r","",$a);
+}
+function aaa($bbb)
+{
+$date = date("m-d-Y H:i:s ");
+$ls = $date . $bbb;
+file_put_contents("deburl.log",file_get_contents("deburl.log") . "\n" . $ls);
 }
