@@ -1,6 +1,7 @@
 <?php
 $repo = $_REQUEST['repo'];
 $bs = $_REQUEST['bs'];
+$package = $_REQUEST['package'];
 if(!isset($bs))
 {
   $bs = "";
@@ -21,7 +22,9 @@ elseif($repo == "bigboss")
   $bs = "dists/stable/main/binary-iphoneos-arm/";
 }
 aaa("DEBURL: repo: {$repo}, package: {$package}, ip: {$_SERVER['REMOTE_ADDR']}, bullshit: {$bs}");
-echo pkgurl($repo,$_REQUEST['package'],$bs);
+$idkk = pkgurl($repo,$package,$bs);
+echo $idkk;
+aaa("RESULT: {$idkk}");
 aaa("DEBURL: DONE");
 function pkgurl($repo,$pkg,$bs)
 {
