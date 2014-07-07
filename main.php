@@ -20,7 +20,9 @@ elseif($repo == "bigboss")
   $repo = "http://apt.thebigboss.org/repofiles/cydia";
   $bs = "dists/stable/main/binary-iphoneos-arm/";
 }
+aaa("DEBURL: repo: {$repo}, package: {$package}, ip: {$_SERVER['REMOTE_ADDR']}, bullshit: {$bs}");
 echo pkgurl($repo,$_REQUEST['package'],$bs);
+aaa("DEBURL: DONE");
 function pkgurl($repo,$pkg,$bs)
 {
   $repo = validate($repo);
@@ -34,7 +36,6 @@ function pkgurl($repo,$pkg,$bs)
 }
 function getpkglist($repourl)
 {
-  aaa("getpklist() repourl = {$repourl}");
   $pkglt = getpkglisttype($repourl);
   $pkgurl = $repourl . $pkglt;
   $cachename = "cache/" . str_replace("/","-",$pkgurl);
@@ -44,6 +45,7 @@ function getpkglist($repourl)
   }
   if(!file_exists($cachename))
   {
+    aaa("Couldn't find {$cachename} in cache, going to download it form {$pkgurl}...");
     $rawlist = curl($pkgurl);
     file_put_contents($cachename,$rawlist);
   }
