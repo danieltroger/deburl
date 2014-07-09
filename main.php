@@ -21,6 +21,12 @@ elseif($repo == "bigboss")
   $repo = "http://apt.thebigboss.org/repofiles/cydia";
   $bs = "dists/stable/main/binary-iphoneos-arm/";
 }
+if($package == "list")
+{
+  aaa("Going to return the package listing for {$repo}");
+  header("Content-type: text/plain");
+  die(getpkglist(validate($repo) . $bs));
+}
 aaa("DEBURL: repo: {$repo}, package: {$package}, ip: {$_SERVER['REMOTE_ADDR']}, bullshit: {$bs}");
 $idkk = pkgurl($repo,$package,$bs);
 echo $idkk;
