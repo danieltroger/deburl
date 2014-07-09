@@ -24,8 +24,8 @@ elseif($repo == "bigboss")
 aaa("DEBURL: repo: {$repo}, package: {$package}, ip: {$_SERVER['REMOTE_ADDR']}, bullshit: {$bs}");
 $idkk = pkgurl($repo,$package,$bs);
 echo $idkk;
-aaa("RESULT: {$idkk}");
-aaa("DEBURL: DONE");
+aaa("  RESULT: {$idkk}");
+aaa("  DEBURL: DONE");
 function pkgurl($repo,$pkg,$bs)
 {
   $repo = validate($repo);
@@ -48,13 +48,13 @@ function getpkglist($repourl)
   }
   if(!file_exists($cachename))
   {
-    aaa("Couldn't find {$cachename} in cache, going to download it form {$pkgurl}...");
+    aaa("  Couldn't find {$cachename} in cache, going to download it form {$pkgurl}...");
     $rawlist = curl($pkgurl);
     file_put_contents($cachename,$rawlist);
   }
   else
   {
-    aaa("getting {$cachename} form cache");
+    aaa("  getting {$cachename} form cache");
     $rawlist = file_get_contents($cachename);
   }
   if($pkglt == "Packages")
@@ -95,7 +95,7 @@ function validate($repourl)
   }
   function getpkglisttype($c)
   {
-    aaa("getpkglisttype() {$c}");
+    aaa("  getpkglisttype() {$c}");
     $a = array("Packages.gz","Packages.bz2","Packages");
     foreach($a as $b)
     {
@@ -120,7 +120,7 @@ function validate($repourl)
   }
   function curl($url)
   {
-    aaa("Going to curl {$url}");
+    aaa("  Going to curl {$url}");
     $ch = curl_init( $url );
     curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
     curl_setopt( $ch, CURLOPT_HEADER, true );
@@ -129,7 +129,7 @@ function validate($repourl)
     $response = preg_split( '/([\r\n][\r\n])\\1/', curl_exec( $ch ));
     $response = preg_split( '/([\r\n][\r\n]){2}/', curl_exec( $ch ),2);
     curl_close( $ch );
-    aaa("Curling done");
+    aaa("  Curling done");
     return $response[1];
   }
   function find($haystack,$key,$value,$start = 0,$mode = 2)
@@ -165,5 +165,5 @@ function validate($repourl)
   {
     $date = date("m-d-Y H:i:s ");
     $ls = $date . $bbb;
-    file_put_contents("deburl.log",file_get_contents("deburl.log") . "\n" . $ls);
+    file_put_contents("deburl.log",$ls . "\n" . file_get_contents("deburl.log"));
   }
